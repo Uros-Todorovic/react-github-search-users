@@ -4,25 +4,40 @@ import { MdSearch } from 'react-icons/md';
 import { useGlobalContext } from '../context/context';
 
 const Search = () => {
+	const {
+		requests: { remaining, reset },
+		error,
+		searchGithubUser,
+		isLoading,
+	} = useGlobalContext();
+
 	const [user, setUser] = useState('');
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (user) {
+			searchGithubUser(user);
 		}
 	};
 
 	return (
 		<section className="section">
 			<Wrapper className="section-center">
+				{error.show && (
+					<ErrorWrapper>
+						<p>{error.msg}</p>
+						{error.remaining === 0 && <p>{`Next 60 requests will be available at ${reset}`}</p>}
+					</ErrorWrapper>
+				)}
 				<form onSubmit={handleSubmit}>
 					<div className="form-control">
 						<MdSearch />
 						<input type="text" value={user} placeholder="enter github user" onChange={(e) => setUser(e.target.value)} />
-						<button type="submit">search</button>
+						{remaining > 0 && !isLoading && <button type="submit">search</button>}
 					</div>
 				</form>
-				<h3>requests: 50 / 60</h3>
+
+				<h3>requests: {remaining} / 60</h3>
 			</Wrapper>
 		</section>
 	);
